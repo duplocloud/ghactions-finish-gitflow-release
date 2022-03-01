@@ -32,12 +32,15 @@ outputs:
   release_branch:
     description: release git branch
     value: "${{ steps.validate.outputs.release_branch }}"
-  pull_request_id:
-    description: pull request ID
-    value: "${{ steps.create-pr.outputs.pull_request_number }}"
-  pull_request_url:
-    description: pull request URL
-    value: "${{ steps.create-pr.outputs.pull_request_url }}"
+  release_commit:
+    description: release git commit
+    value: "${{ steps.validate.outputs.release_commit }}"
+  source_ref:
+    description: release source ref (pull request head)
+    value: "${{ steps.validate.outputs.source_ref }}"
+  target_ref:
+    description: release target ref (pull request base)
+    value: "${{ steps.validate.outputs.target_ref }}"
 runs:
   using: 'composite'
   steps:
