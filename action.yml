@@ -69,7 +69,7 @@ runs:
         RELEASE_COMMIT="$(git rev-parse HEAD)"
 
         # Validate that the release commit exists in the target ref
-        if ! git merge-base --is-ancestor "$RELEASE_COMMIT" "$TARGET_REF" then
+        if ! git merge-base --is-ancestor "$RELEASE_COMMIT" "$TARGET_REF"; then
           echo "::error cannot finish the release: the release must already be merged into '$TARGET_REF' branch"
           exit 1
         fi
