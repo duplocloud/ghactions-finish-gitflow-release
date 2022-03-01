@@ -1,0 +1,122 @@
+name: 'DuploCloud Finish Release'
+description: 'Finishes a gitflow release'
+author: 'DuploCloud, Inc.'
+inputs:
+  github_token:
+    required: true
+    description: 'Github token to use for pushing and creating the PR'
+  target_ref:
+    required: false
+    description: 'release target ref (pull request base ref - defaults to {{ github.base_ref }}, which is usually master)'
+    default: ''
+  source_ref:
+    required: false
+    description: 'release source ref (pull request head ref - defaults to {{ github.head_ref }})'
+    default: ''
+  develop_ref:
+    required: false
+    description: 'develop ref (defaults to develop)'
+    default: 'develop'
+  tag_prefix:
+    required: false
+    description: 'The tag prefix (defaults to "v")'
+    default: 'v'
+  delete_branch:
+    required: false
+    description: 'Whether or not to delete the release branch.'
+    default: 'true'
+outputs:
+  release_tag:
+    description: release git tag (with version prefix)
+    value: "${{ steps.validate.outputs.release_tag }}"
+  release_branch:
+    description: release git branch
+    value: "${{ steps.validate.outputs.release_branch }}"
+  pull_request_id:
+    description: pull request ID
+    value: "${{ steps.create-pr.outputs.pull_request_number }}"
+  pull_request_url:
+    description: pull request URL
+    value: "${{ steps.create-pr.outputs.pull_request_url }}"
+runs:
+  using: 'composite'
+  steps:
+    # VALIDATION:  This check validates that the release has already been merged into master.
+    #   - It also creates an "output" identifying the release commit.
+    - id: validate
+      shell: bash
+      run: |
+        # Fail on errors, and strictly interpret shell code
+        set -eu
+
+        # Get the target ref.
+        [ -z "$TARGET_REF" ] && TARGET_REF="${{ github.base_ref }}"
+        [ -z "$TARGET_REF" ] && TARGET_REF="master"
+
+        # Get the source ref.
+        [ -z "$SOURCE_REF" ] && SOURCE_REF="${{ github.head_ref }}"
+        [ -z "$SOURCE_REF" ] && SOURCE_REF="$(git rev-parse --abbrev-ref HEAD)"
+
+        # Get the release commit
+        git checkout "$SOURCE_REF"
+
+        # Identity the release version and the target git commit
+        RELEASE_VERSION="${SOURCE_REF##*/}"
+        RELEASE_TAG="${{ inputs.tag_prefix }}$RELEASE_VERSION"
+        RELEASE_COMMIT="$(git rev-parse HEAD)"
+
+        # Validate that the release commit exists in the target ref
+        if ! git merge-base --is-ancestor "$RELEASE_COMMIT" "$TARGET_REF" then
+          echo "::error cannot finish the release: the release must already be merged into '$TARGET_REF' branch"
+          exit 1
+        fi
+        
+        # Checkout the target ref again, and output the release ref, tag and commit
+        git checkout "$TARGET_REF"
+        echo "::set-output name=source_ref::$SOURCE_REF"
+        echo "::set-output name=target_ref::$TARGET_REF"
+        echo "::set-output name=release_version::$RELEASE_VERSION"
+        echo "::set-output name=release_tag::$RELEASE_TAG"
+        echo "::set-output name=release_commit::$RELEASE_COMMIT"
+      env:
+        SOURCE_REF: "${{ inputs.source_ref }}"
+        TARGET_REF: "${{ inputs.target_ref }}"
+
+    # PUSH RELEASE TO GIT
+    - id: tag-and-push
+      shell: bash
+      run: |
+        git tag "$RELEASE_TAG" &&
+        git push origin "$RELEASE_TAG"
+      env:
+        RELEASE_TAG: "${{ steps.validate.outputs.release_tag }}"
+
+    # START NEXT DEVELOP ITERATION:
+    #   - Checkout develop.
+    #   - Merge master back into develop.
+    #   - Push develop.
+    - id: checkout-develop
+      uses: actions/checkout@v2
+      with:
+        ref: "${{ inputs.develop_ref }}"
+        fetch-depth: 0              # Workaround to allow merging from origin/master
+        persist-credentials: false  # Needed so we can push with different credentials.
+                                    # NOTE: Pushing with different credentials allows admins to push protected branches.
+                                    # NOTE: Pushing with different credentials allow workflows to trigger from the push.
+    - id: merge-develop
+      shell: bash
+      run: |
+        git merge origin/${{ steps.validate.outputs.target_ref }} --no-edit
+    - name: Push develop
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ inputs.github_token }}
+        branch: develop
+
+    # CLEAN UP RELEASE BRANCH
+    - name: Delete the release branch.
+      if: ${{ inputs.delete_branch }}
+      uses: maxkomarychev/octions/octions/git/delete-ref@master
+      with:
+        token: ${{ inputs.github_token }}
+        ref: "refs/heads/${{ steps.validate.outputs.source_ref }}"

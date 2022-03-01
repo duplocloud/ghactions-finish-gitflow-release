@@ -1,0 +1,19 @@
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+*.tgz
+
+# dotenv environment variables file
+.envrc
+.env
+.env.test
+
+# OS metadata
+.DS_Store
+Thumbs.db
