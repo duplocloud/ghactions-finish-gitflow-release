@@ -4,7 +4,7 @@ author: 'DuploCloud, Inc.'
 inputs:
   github_token:
     required: true
-    description: 'Github token to use for pushing and creating the PR'
+    description: 'Github token to use for pushing the tag and deleting the release branch'
   target_ref:
     required: false
     description: 'release target ref (pull request base ref - defaults to {{ github.base_ref }}, which is usually master)'
@@ -91,11 +91,10 @@ runs:
         TARGET_REF: "${{ inputs.target_ref }}"
 
     # PUSH RELEASE TO GIT
-    - id: tag-and-push
+    - id: tag-release
       shell: bash
       run: |
-        git tag "$RELEASE_TAG" &&
-        git push origin "$RELEASE_TAG"
+        git tag "$RELEASE_TAG"
       env:
         RELEASE_TAG: "${{ steps.validate.outputs.release_tag }}"
 
@@ -120,6 +119,7 @@ runs:
       with:
         github_token: ${{ inputs.github_token }}
         branch: develop
+        tags: true
 
     # CLEAN UP RELEASE BRANCH
     - name: Delete the release branch.
