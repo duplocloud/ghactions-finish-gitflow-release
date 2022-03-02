@@ -127,4 +127,4 @@ runs:
       uses: maxkomarychev/octions/octions/git/delete-ref@master
       with:
         token: ${{ inputs.github_token }}
-        ref: "refs/heads/${{ steps.validate.outputs.source_ref }}"
+        ref: "heads/${{ steps.validate.outputs.source_ref }}"
