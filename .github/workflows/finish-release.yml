@@ -62,4 +62,8 @@ jobs:
 
           echo "${prefix}.${bump}" >VERSION
           git commit -m 'version bump' VERSION
-          git push
+      - name: Push develop
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.RELEASE_BOT_GITHUB_TOKEN }}
+          branch: develop
