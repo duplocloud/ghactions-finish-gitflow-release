@@ -97,6 +97,12 @@ runs:
         git tag "$RELEASE_TAG"
       env:
         RELEASE_TAG: "${{ steps.validate.outputs.release_tag }}"
+    - name: Push tag
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ inputs.github_token }}
+        branch: ${{ steps.validate.outputs.target_ref }}
+        tags: true
 
     # START NEXT DEVELOP ITERATION:
     #   - Checkout develop.
@@ -114,16 +120,14 @@ runs:
       shell: bash
       run: |
         git merge origin/${{ steps.validate.outputs.target_ref }} --no-edit
-    - name: Push develop
-      uses: ad-m/github-push-action@master
+    - uses: ad-m/github-push-action@master
       with:
         github_token: ${{ inputs.github_token }}
         branch: develop
         tags: true
 
     # CLEAN UP RELEASE BRANCH
-    - name: Delete the release branch.
-      if: ${{ inputs.delete_branch }}
+    - if: ${{ inputs.delete_branch }}
       uses: maxkomarychev/octions/octions/git/delete-ref@master
       with:
         token: ${{ inputs.github_token }}
