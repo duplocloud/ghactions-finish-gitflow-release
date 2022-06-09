@@ -54,8 +54,8 @@ jobs:
 | source_ref | release source ref (pull request head ref - defaults to `${{ github.head_ref }})`' | false | `""` |
 | develop_ref | develop ref (defaults to develop) | false | `"develop"` |
 | tag_prefix | The tag prefix (defaults to "v") | false | `"v"` |
-| delete_branch | Whether or not to delete the release branch. | false | `true` |
-| validate_merge | Validates that the `source_ref` was already merged into the `target_ref`.  Set this to `false` if you merge a squashed commit. | false | `true` |
+| delete_branch | Whether or not to delete the release branch. Set this to `false` if your source ref has previously been deleted. | false | `true` |
+| validate_merge | Validates that the `source_ref` was already merged into the `target_ref`.  Set this to `false` if you merge a squashed commit or if your source ref has previously been deleted. | false | `true` |
 
 ## Outputs
 
