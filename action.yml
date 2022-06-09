@@ -65,7 +65,10 @@ runs:
         [ -z "$SOURCE_REF" ] && SOURCE_REF="$(git rev-parse --abbrev-ref HEAD)"
 
         # Get the release commit
-        git checkout "$SOURCE_REF"
+        if [ "$VALIDATE_MERGE" = "true" ]
+        then git checkout "$SOURCE_REF"
+        else git checkout "$TARGET_REF"
+        fi
 
         # Identity the release version and the target git commit
         RELEASE_VERSION="${SOURCE_REF##*/}"
