@@ -130,7 +130,7 @@ runs:
         tags: true
 
     # CLEAN UP RELEASE BRANCH
-    - if: ${{ inputs.delete_branch }}
+    - if: ${{ inputs.delete_branch == 'true' }}
       uses: maxkomarychev/octions/octions/git/delete-ref@master
       with:
         token: ${{ inputs.github_token }}
