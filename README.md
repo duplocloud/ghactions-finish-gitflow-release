@@ -51,7 +51,7 @@ jobs:
 |------|-------------|----------|---------|
 | github_token | Github token to use for pushing the tag and deleting the release branch | true | unset |
 | target_ref | release target ref (pull request base ref - defaults to `${{ github.base_ref }}`, which is usually master) | false | `""` |
-| source_ref | release source ref (pull request head ref - defaults to `${{ github.head_ref }})`' | false | `""` |
+| source_ref | release source ref (pull request head ref - defaults to `${{ github.head_ref }}`' | false | `""` |
 | develop_ref | develop ref (defaults to develop) | false | `"develop"` |
 | tag_prefix | The tag prefix (defaults to "v") | false | `"v"` |
 | delete_branch | Whether or not to delete the release branch. Set this to `false` if your source ref has previously been deleted. | false | `true` |
