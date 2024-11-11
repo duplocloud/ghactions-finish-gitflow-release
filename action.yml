@@ -112,7 +112,7 @@ runs:
     #   - Merge master back into develop.
     #   - Push develop.
     - id: checkout-develop
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: "${{ inputs.develop_ref }}"
         fetch-depth: 0              # Workaround to allow merging from origin/master
