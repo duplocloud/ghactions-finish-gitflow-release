@@ -132,6 +132,7 @@ runs:
     # CLEAN UP RELEASE BRANCH
     - name: Delete branch
       if: ${{ inputs.delete_branch == 'true' }}
+      shell: bash
       run: |
         sudo apt-get install -y gh
         gh api -X DELETE "repos/${GITHUB_REPOSITORY}/git/refs/heads/${{ steps.validate.outputs.source_ref }}"
