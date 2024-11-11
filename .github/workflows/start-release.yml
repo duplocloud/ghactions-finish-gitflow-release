@@ -35,7 +35,7 @@ jobs:
 
           # Otherwise, the use the overridden version.
           else
-            echo "release=${{ github.event.inputs.version }} >> $GITHUB_OUTPUT"
+            echo "release=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           fi
 
       # START THE RELEASE
