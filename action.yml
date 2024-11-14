@@ -101,7 +101,7 @@ runs:
       env:
         RELEASE_TAG: "${{ steps.validate.outputs.release_tag }}"
     - name: Push tag
-      uses: ad-m/github-push-action@master
+      uses: ad-m/github-push-action@v0.8.0
       with:
         github_token: ${{ inputs.github_token }}
         branch: ${{ steps.validate.outputs.target_ref }}
@@ -112,7 +112,7 @@ runs:
     #   - Merge master back into develop.
     #   - Push develop.
     - id: checkout-develop
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         ref: "${{ inputs.develop_ref }}"
         fetch-depth: 0              # Workaround to allow merging from origin/master
@@ -123,15 +123,15 @@ runs:
       shell: bash
       run: |
         git merge origin/${{ steps.validate.outputs.target_ref }} --no-edit
-    - uses: ad-m/github-push-action@master
+    - uses: ad-m/github-push-action@v0.8.0
       with:
         github_token: ${{ inputs.github_token }}
         branch: develop
         tags: true
 
     # CLEAN UP RELEASE BRANCH
-    - if: ${{ inputs.delete_branch == 'true' }}
-      uses: maxkomarychev/octions/octions/git/delete-ref@master
+      if: ${{ inputs.delete_branch == 'true' }}
+      uses: maxkomarychev/octions/octions/git/delete-ref@v0.11.0
       with:
         token: ${{ inputs.github_token }}
         ref: "heads/${{ steps.validate.outputs.source_ref }}"
