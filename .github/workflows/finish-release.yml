@@ -7,14 +7,14 @@ on:
       - master
 env:
   git_user: duplo-bot
-  git_email: joe+github-bot@duplocloud.net
+  git_email: infra+github-bot@duplocloud.net
 jobs:
   finish-release:
     if: github.event.pull_request.merged == true && (startsWith(github.head_ref, 'refs/heads/release/') || startsWith(github.head_ref, 'release/'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: master                 # Always finish releases from the "merged to" master
           fetch-depth: 0
@@ -39,7 +39,7 @@ jobs:
       - finish-release
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: develop
           fetch-depth: 0
@@ -51,10 +51,10 @@ jobs:
         run: |
           git config --global user.name $git_user &&
           git config --global user.email $git_email
-      - name: Use Node.js 16.x
-        uses: actions/setup-node@v3
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v4
         with:
-          node-version: 16.x
+          node-version: 20
       - name: Version bump
         run: |
           set -euo pipefail
