@@ -29,6 +29,10 @@ inputs:
     required: false
     description: 'Validates that the source_ref was already merged into the target_ref.  Set this to "false" if you merge a squashed commit.'
     default: 'true'
+  is_hotfix:
+    required: false
+    description: 'Whether or not pipeline triggered from hotfix.'
+    default: 'false'
 outputs:
   release_tag:
     description: release git tag (with version prefix)
@@ -113,6 +117,7 @@ runs:
     #   - Push develop.
     - id: checkout-develop
       uses: actions/checkout@v4
+      if: "${{ ! inputs.is_hotfix }}"
       with:
         ref: "${{ inputs.develop_ref }}"
         fetch-depth: 0              # Workaround to allow merging from origin/master
@@ -120,10 +125,12 @@ runs:
                                     # NOTE: Pushing with different credentials allows admins to push protected branches.
                                     # NOTE: Pushing with different credentials allow workflows to trigger from the push.
     - id: merge-develop
+      if: "${{ ! inputs.is_hotfix }}"
       shell: bash
       run: |
         git merge origin/${{ steps.validate.outputs.target_ref }} --no-edit
     - uses: ad-m/github-push-action@v0.8.0
+      if: "${{ ! inputs.is_hotfix }}"
       with:
         github_token: ${{ inputs.github_token }}
         branch: develop
