@@ -117,7 +117,7 @@ runs:
     #   - Push develop.
     - id: checkout-develop
       uses: actions/checkout@v4
-      if: "${{ ! inputs.is_hotfix }}"
+      if: "${{ inputs.is_hotfix != 'true' }}"
       with:
         ref: "${{ inputs.develop_ref }}"
         fetch-depth: 0              # Workaround to allow merging from origin/master
@@ -125,12 +125,12 @@ runs:
                                     # NOTE: Pushing with different credentials allows admins to push protected branches.
                                     # NOTE: Pushing with different credentials allow workflows to trigger from the push.
     - id: merge-develop
-      if: "${{ ! inputs.is_hotfix }}"
+      if: "${{ inputs.is_hotfix != 'true' }}"
       shell: bash
       run: |
         git merge origin/${{ steps.validate.outputs.target_ref }} --no-edit
     - uses: ad-m/github-push-action@v0.8.0
-      if: "${{ ! inputs.is_hotfix }}"
+      if: "${{ inputs.is_hotfix != 'true' }}"
       with:
         github_token: ${{ inputs.github_token }}
         branch: develop
